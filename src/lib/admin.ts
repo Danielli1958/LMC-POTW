@@ -5,7 +5,7 @@ export const checkIsAdmin = async (): Promise<boolean> => {
   if (!user) return false;
 
   const { data: profile } = await supabase
-    .from('profiles')
+    .from('lmc_profiles')
     .select('is_admin')
     .eq('user_id', user.id)
     .single();
@@ -23,7 +23,7 @@ export const withAdminAuth = async (callback: () => Promise<void>) => {
 
 export const resetYearlyLeaderboard = async () => {
   return withAdminAuth(async () => {
-    const { error } = await supabase.rpc('reset_yearly_leaderboard');
+    const { error } = await supabase.rpc('reset_lmc_yearly_leaderboard');
     if (error) throw error;
   });
 };

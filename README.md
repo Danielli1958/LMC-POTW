@@ -1,6 +1,6 @@
-# Math Club Problem of The WeekPlatform
+# Lincoln Math Competition Problem of The Week Platform
 
-Lincoln High School Math Club's Problem of The Week.
+Lincoln Math Competition's Problem of The Week.
 
 **Prerequisites**
 - Node.js 18+ and npm 9+

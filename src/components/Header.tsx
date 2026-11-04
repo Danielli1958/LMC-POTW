@@ -14,11 +14,11 @@ export function Header({ user, onLogout }: HeaderProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden">
-              <img src="/lynx-logo.png" alt="LHS Lynx Logo" className="w-8 h-8 object-contain" />
+              <img src="/lynx-logo.png" alt="Lincoln Lynx Logo" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold font-display tracking-wider text-foreground">
-                LHS Math Club
+                Lincoln Math Competition
               </h1>
               <p className="text-xs text-muted-foreground">Problem of the Week</p>
             </div>

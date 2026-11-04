@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, RotateCcw, Archive, ArchiveRestore } from 'lucide-react';
+import { Plus, RotateCcw, Archive, ArchiveRestore, Images } from 'lucide-react';
+import { SubmissionsDialog } from '@/components/SubmissionsDialog';
 import { ProblemFormData } from '@/types/admin';
 import { toast } from 'sonner';
 import { resetYearlyLeaderboard } from '@/lib/admin';
@@ -43,6 +44,7 @@ export default function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState("manage-problems");
   const [isResettingLeaderboard, setIsResettingLeaderboard] = useState(false);
+  const [viewingSubmissionsFor, setViewingSubmissionsFor] = useState<{ id: string; title: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function Admin() {
       }
 
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('lmc_profiles')
         .select('is_admin')
         .eq('user_id', user.id)
         .single();
@@ -83,7 +85,7 @@ export default function Admin() {
   const fetchProblems = async () => {
     try {
       const { data, error } = await supabase
-        .from('problems')
+        .from('lmc_problems')
         .select('*')
         .order('week_number', { ascending: true })
         .order('created_at', { ascending: false });
@@ -116,11 +118,11 @@ export default function Admin() {
   const saveSolution = async (problemId: string, solution: string) => {
     if (solution.trim()) {
       const { error } = await supabase
-        .from('problem_solutions')
+        .from('lmc_problem_solutions')
         .upsert({ problem_id: problemId, solution, updated_at: new Date().toISOString() });
       if (error) throw error;
     } else {
-      const { error } = await supabase.from('problem_solutions').delete().eq('problem_id', problemId);
+      const { error } = await supabase.from('lmc_problem_solutions').delete().eq('problem_id', problemId);
       if (error) throw error;
     }
   };
@@ -137,7 +139,7 @@ export default function Admin() {
     try {
       if (isEditing && formData.id) {
         const { error } = await supabase
-          .from('problems')
+          .from('lmc_problems')
           .update({ ...problemData, updated_at: new Date().toISOString() })
           .eq('id', formData.id);
 
@@ -147,7 +149,7 @@ export default function Admin() {
         setActiveTab("manage-problems");
       } else {
         const { data: created, error } = await supabase
-          .from('problems')
+          .from('lmc_problems')
           .insert([problemData])
           .select('id')
           .single();
@@ -176,7 +178,7 @@ export default function Admin() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const { data, error } = await supabase
-      .from('problem_solutions')
+      .from('lmc_problem_solutions')
       .select('solution')
       .eq('problem_id', problem.id)
       .maybeSingle();
@@ -193,7 +195,7 @@ export default function Admin() {
   const handleArchive = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('problems')
+        .from('lmc_problems')
         .update({ is_archived: true, is_active: false })
         .eq('id', id);
 
@@ -210,7 +212,7 @@ export default function Admin() {
   const handleUnarchive = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('problems')
+        .from('lmc_problems')
         .update({ is_archived: false })
         .eq('id', id);
 
@@ -229,7 +231,7 @@ export default function Admin() {
     
     try {
       const { error } = await supabase
-        .from('problems')
+        .from('lmc_problems')
         .delete()
         .eq('id', id);
 
@@ -526,6 +528,14 @@ export default function Admin() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setViewingSubmissionsFor({ id: problem.id, title: problem.title })}
+                        >
+                          <Images className="h-4 w-4 mr-2" />
+                          Submissions
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleEdit(problem)}
                         >
                           Edit
@@ -576,6 +586,14 @@ export default function Admin() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setViewingSubmissionsFor({ id: problem.id, title: problem.title })}
+                        >
+                          <Images className="h-4 w-4 mr-2" />
+                          Submissions
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleUnarchive(problem.id)}
                         >
                           <ArchiveRestore className="h-4 w-4 mr-2" />
@@ -615,6 +633,11 @@ export default function Admin() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <SubmissionsDialog
+        problem={viewingSubmissionsFor}
+        onClose={() => setViewingSubmissionsFor(null)}
+      />
     </div>
   );
 }

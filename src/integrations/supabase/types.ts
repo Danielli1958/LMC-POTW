@@ -12,7 +12,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      problems: {
+      lmc_problems: {
         Row: {
           correct_answer: string
           created_at: string
@@ -75,7 +75,7 @@ export type Database = {
         }
         Relationships: []
       }
-      problem_solutions: {
+      lmc_problem_solutions: {
         Row: {
           created_at: string
           problem_id: string
@@ -96,15 +96,15 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "problem_solutions_problem_id_fkey"
+            foreignKeyName: "lmc_problem_solutions_problem_id_fkey"
             columns: ["problem_id"]
             isOneToOne: true
-            referencedRelation: "problems"
+            referencedRelation: "lmc_problems"
             referencedColumns: ["id"]
           },
         ]
       }
-      profiles: {
+      lmc_profiles: {
         Row: {
           all_time_points: number
           all_time_problems_solved: number
@@ -146,7 +146,7 @@ export type Database = {
         }
         Relationships: []
       }
-      submissions: {
+      lmc_submissions: {
         Row: {
           id: string
           is_correct: boolean
@@ -155,6 +155,7 @@ export type Database = {
           selected_answer: string
           submitted_at: string
           user_id: string
+          work_photo_path: string | null
         }
         Insert: {
           id?: string
@@ -164,6 +165,7 @@ export type Database = {
           selected_answer: string
           submitted_at?: string
           user_id: string
+          work_photo_path?: string | null
         }
         Update: {
           id?: string
@@ -173,13 +175,14 @@ export type Database = {
           selected_answer?: string
           submitted_at?: string
           user_id?: string
+          work_photo_path?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "submissions_problem_id_fkey"
+            foreignKeyName: "lmc_submissions_problem_id_fkey"
             columns: ["problem_id"]
             isOneToOne: false
-            referencedRelation: "problems"
+            referencedRelation: "lmc_problems"
             referencedColumns: ["id"]
           },
         ]
@@ -189,7 +192,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      reset_yearly_leaderboard: {
+      ensure_lmc_profile: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      is_lmc_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      reset_lmc_yearly_leaderboard: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

@@ -52,7 +52,7 @@ const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
       }
 
       const { data: profile, error } = await supabase
-        .from('profiles')
+        .from('lmc_profiles')
         .select('is_admin')
         .eq('user_id', user.id)
         .single();

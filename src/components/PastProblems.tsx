@@ -47,7 +47,7 @@ export function PastProblems({ userId }: PastProblemsProps) {
       setError(false);
       try {
         const { data: problemRows, error: problemError } = await supabase
-          .from("problems")
+          .from("lmc_problems")
           .select(
             "id, title, description, difficulty, points, week_number, due_date, correct_answer, option_a, option_b, option_c, option_d"
           )
@@ -62,11 +62,11 @@ export function PastProblems({ userId }: PastProblemsProps) {
 
         const [solutionRes, submissionRes] = await Promise.all([
           ids.length
-            ? supabase.from("problem_solutions").select("problem_id, solution").in("problem_id", ids)
+            ? supabase.from("lmc_problem_solutions").select("problem_id, solution").in("problem_id", ids)
             : Promise.resolve({ data: [], error: null }),
           ids.length && userId
             ? supabase
-                .from("submissions")
+                .from("lmc_submissions")
                 .select("problem_id, selected_answer, is_correct, points_earned")
                 .eq("user_id", userId)
                 .in("problem_id", ids)

@@ -7,7 +7,7 @@ export interface ProblemFormData {
   week_number: number;
   due_date: string;
   hint: string;
-  /** Stored separately in problem_solutions; visible to students after the due date. */
+  /** Stored separately in lmc_problem_solutions; visible to students after the due date. */
   solution: string;
   correct_answer: string;
   option_a: string;

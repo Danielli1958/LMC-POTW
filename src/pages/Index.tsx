@@ -124,7 +124,7 @@ const Index = () => {
   const updateLeaderboard = useCallback(async () => {
     try {
       const { data: profiles, error } = await supabase
-        .from("profiles")
+        .from("lmc_profiles")
         .select("display_name, total_points, problems_solved, current_streak, user_id, updated_at, all_time_points, all_time_problems_solved");
 
       if (error) throw error;
@@ -234,7 +234,7 @@ const Index = () => {
     if (!currentProblem?.id || !user?.id) return;
 
     const { data: submission } = await supabase
-      .from("submissions")
+      .from("lmc_submissions")
       .select("selected_answer, is_correct")
       .eq("user_id", user.id)
       .eq("problem_id", currentProblem.id)
@@ -247,7 +247,7 @@ const Index = () => {
     if (!problemId) return new Map();
     
     const { data: problem, error } = await supabase
-      .from('problems')
+      .from('lmc_problems')
       .select('submitted_user_ids')
       .eq('id', problemId)
       .single();
@@ -274,12 +274,19 @@ const Index = () => {
     console.log('Fetching data...');
     setLoading(true);
     try {
+      if (user) {
+        // Auth users are shared with the high-school POTW app, so create this
+        // user's LMC profile (if missing) before reading the leaderboard.
+        const { error: profileError } = await supabase.rpc("ensure_lmc_profile");
+        if (profileError) console.error("Error creating LMC profile:", profileError);
+      }
+
       const nowIso = new Date().toISOString();
 
       // A problem closes at its due date, even if the cron job hasn't flipped is_active yet.
       const [{ data: currentRows }, { data: previousRows }] = await Promise.all([
         supabase
-          .from("problems")
+          .from("lmc_problems")
           .select("*")
           .eq("is_active", true)
           .eq("is_archived", false)
@@ -288,7 +295,7 @@ const Index = () => {
           .limit(1),
         // Most recently closed problem; used as a leaderboard tie-breaker.
         supabase
-          .from("problems")
+          .from("lmc_problems")
           .select("*")
           .eq("was_published", true)
           .eq("is_archived", false)
@@ -305,7 +312,7 @@ const Index = () => {
 
         if (user) {
           const { data: submission } = await supabase
-            .from("submissions")
+            .from("lmc_submissions")
             .select("selected_answer, is_correct")
             .eq("user_id", user.id)
             .eq("problem_id", current.id)
@@ -494,7 +501,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 Lincoln Math Club.</p>
+          <p>© 2026 Lincoln Math Competition.</p>
         </div>
       </footer>
     </div>

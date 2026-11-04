@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Calendar, Clock, CheckCircle2, Send, Lightbulb, XCircle } from "lucide-react";
+import { Calendar, Clock, CheckCircle2, Send, Lightbulb, XCircle, Camera, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MathText } from "@/components/MathText";
+import { uploadWorkPhoto } from "@/lib/workPhotos";
 
 interface Problem {
   id: string;
@@ -46,7 +47,39 @@ export function ProblemCard({
   const [showHint, setShowHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<{ correct: boolean; answer: string } | null>(null);
+  const [workPhoto, setWorkPhoto] = useState<File | null>(null);
+  const [workPhotoPreview, setWorkPhotoPreview] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!workPhoto) {
+      setWorkPhotoPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(workPhoto);
+    setWorkPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [workPhoto]);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file && !file.type.startsWith("image/") && !/\.(heic|heif)$/i.test(file.name)) {
+      toast({
+        title: "Not a Photo",
+        description: "Please choose an image file of your work.",
+        variant: "destructive",
+      });
+      e.target.value = "";
+      return;
+    }
+    setWorkPhoto(file);
+  };
+
+  const clearPhoto = () => {
+    setWorkPhoto(null);
+    if (photoInputRef.current) photoInputRef.current.value = "";
+  };
 
   useEffect(() => {
     if (existingSubmission) {
@@ -96,6 +129,15 @@ export function ProblemCard({
       return;
     }
 
+    if (!workPhoto) {
+      toast({
+        title: "Photo Required",
+        description: "Please add a photo of your work before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (existingSubmission) {
       toast({
         title: "Already Submitted",
@@ -111,18 +153,19 @@ export function ProblemCard({
       const isCorrect = selectedAnswer === problem.correct_answer;
       const pointsEarned = isCorrect ? problem.points : Math.floor(problem.points * 0.1);
 
+      // Upload first: the database only accepts a submission whose photo exists.
+      const workPhotoPath = await uploadWorkPhoto(userId, problem.id, workPhoto);
+
       const { data: submission, error } = await supabase
-        .from("submissions")
-        .upsert(
-          {
-            user_id: userId,
-            problem_id: problem.id,
-            selected_answer: selectedAnswer,
-            is_correct: isCorrect,
-            points_earned: pointsEarned,
-          },
-          { onConflict: "user_id,problem_id" }
-        )
+        .from("lmc_submissions")
+        .insert({
+          user_id: userId,
+          problem_id: problem.id,
+          selected_answer: selectedAnswer,
+          is_correct: isCorrect,
+          points_earned: pointsEarned,
+          work_photo_path: workPhotoPath,
+        })
         .select()
         .single();
 
@@ -241,9 +284,57 @@ export function ProblemCard({
               ))}
             </RadioGroup>
 
+            <div className="mb-6 space-y-2">
+              <Label htmlFor="work-photo" className="text-base">
+                Photo of your work <span className="text-destructive">*</span>
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Take or upload a picture showing how you solved the problem.
+              </p>
+              <input
+                ref={photoInputRef}
+                id="work-photo"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handlePhotoChange}
+                disabled={isSubmitting}
+              />
+              {workPhotoPreview ? (
+                <div className="relative inline-block">
+                  <img
+                    src={workPhotoPreview}
+                    alt="Your work"
+                    className="max-h-64 rounded-lg border object-contain"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={clearPhoto}
+                    disabled={isSubmitting}
+                    aria-label="Remove photo"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={isSubmitting}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Add Photo
+                </Button>
+              )}
+            </div>
+
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !selectedAnswer}
+              disabled={isSubmitting || !selectedAnswer || !workPhoto}
               className="w-full sm:w-auto"
             >
               {isSubmitting ? (
