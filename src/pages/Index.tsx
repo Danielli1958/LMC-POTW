@@ -362,7 +362,7 @@ const Index = () => {
             <span className="text-gradient">PROBLEM OF THE WEEK</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Challenge yourself with weekly math problems. Top scorers get a prize at the end of the year!
+            Challenge yourself with weekly math problems. Top scorers get a prize at LMC!
           </p>
         </section>
 

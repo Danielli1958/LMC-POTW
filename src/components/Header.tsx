@@ -1,6 +1,8 @@
-import { Calculator, LogIn, LogOut, User } from "lucide-react";
+import { Home, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
+const LMC_HOME_URL = "https://lincoln-math-competition-website.vercel.app/";
 
 interface HeaderProps {
   user?: { email: string } | null;
@@ -12,7 +14,11 @@ export function Header({ user, onLogout }: HeaderProps) {
     <header className="bg-primary text-primary-foreground border-b-4 border-foreground/80 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <a
+            href={LMC_HOME_URL}
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+            title="Lincoln Math Competition home"
+          >
             <div className="w-10 h-10 rounded-md bg-white flex items-center justify-center overflow-hidden">
               <img src="/lynx-logo.png" alt="Lincoln Lynx Logo" className="w-8 h-8 object-contain" />
             </div>
@@ -22,9 +28,15 @@ export function Header({ user, onLogout }: HeaderProps) {
               </h1>
               <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/80">Problem of the Week</p>
             </div>
-          </div>
-          
+          </a>
+
           <div className="flex items-center gap-3">
+            <Button variant="inverse" size="sm" asChild>
+              <a href={LMC_HOME_URL}>
+                <Home className="w-4 h-4 mr-1" />
+                LMC Home
+              </a>
+            </Button>
             {user ? (
               <>
                 <span className="text-sm text-primary-foreground/85 hidden sm:block">
