@@ -2,92 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+/*
+ * Lincoln Math Competition theme: deep crimson on white "graph paper".
+ * Intentionally distinct from the LHS Math Club app (bright red, pink
+ * animated gradient, Bebas Neue).
+ */
 @layer base {
   :root {
-    --background: 0 70% 95%;
-    --foreground: 0 0% 10%;
+    --background: 350 30% 95%;
+    --background-top: 350 35% 92%;
+    --bg-wash-strong: 0.22;
+    --bg-wash-soft: 0.16;
+    --bg-art-opacity: 0.22;
+    --foreground: 350 30% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card-foreground: 350 30% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
-    --primary: 0 85% 50%;
+    --popover-foreground: 350 30% 10%;
+    --primary: 350 78% 38%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 350 30% 96%;
+    --secondary-foreground: 350 45% 22%;
 
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 350 14% 88%;
+    --muted-foreground: 350 10% 40%;
 
-    --accent: 0 85% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 350 60% 94%;
+    --accent-foreground: 350 78% 30%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 0 85% 50%;
+    --border: 350 20% 88%;
+    --input: 350 20% 85%;
+    --ring: 350 78% 38%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
     --gold: 45 90% 50%;
     --silver: 0 0% 65%;
     --bronze: 25 60% 45%;
-    --success: 145 70% 40%;
-    
-    --gradient-hero: linear-gradient(135deg, hsl(0 85% 50%), hsl(0 70% 35%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
-    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.08);
-    --shadow-glow: 0 0 40px hsl(0 85% 50% / 0.25);
-    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.12);
+    --success: 145 70% 35%;
 
-    --font-display: 'Bebas Neue', sans-serif;
+    --gradient-hero: linear-gradient(90deg, hsl(350 78% 38%), hsl(350 78% 38%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 100%));
+    --shadow-soft: 0 1px 2px hsl(350 40% 20% / 0.08);
+    --shadow-glow: 0 0 0 3px hsl(350 78% 38% / 0.2);
+    --shadow-card: 0 1px 0 hsl(350 40% 20% / 0.06), 4px 4px 0 hsl(350 78% 38% / 0.12);
+
+    --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 26%;
-    --sidebar-primary: 0 0% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 0 0% 91%;
-    --sidebar-ring: 0 85% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 350 20% 26%;
+    --sidebar-primary: 350 78% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 350 30% 96%;
+    --sidebar-accent-foreground: 350 45% 22%;
+    --sidebar-border: 350 20% 88%;
+    --sidebar-ring: 350 78% 38%;
   }
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 96%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 0 80% 55%;
+    --background: 350 20% 7%;
+    --background-top: 350 25% 10%;
+    --bg-wash-strong: 0.25;
+    --bg-wash-soft: 0.14;
+    --bg-art-opacity: 0.35;
+    --foreground: 350 10% 95%;
+    --card: 350 18% 10%;
+    --card-foreground: 350 10% 95%;
+    --popover: 350 18% 10%;
+    --popover-foreground: 350 10% 95%;
+    --primary: 350 70% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 0 0% 92%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 0 80% 55%;
-    --accent-foreground: 0 0% 100%;
+    --secondary: 350 15% 16%;
+    --secondary-foreground: 350 10% 92%;
+    --muted: 350 15% 14%;
+    --muted-foreground: 350 8% 60%;
+    --accent: 350 30% 18%;
+    --accent-foreground: 350 70% 80%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 80% 55%;
-    --gradient-hero: linear-gradient(135deg, hsl(0 80% 55%), hsl(0 65% 40%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 12%), hsl(0 0% 9%));
-    
-    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.4);
-    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+    --border: 350 15% 20%;
+    --input: 350 15% 20%;
+    --ring: 350 70% 50%;
+    --gradient-hero: linear-gradient(90deg, hsl(350 70% 50%), hsl(350 70% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(350 18% 10%), hsl(350 18% 10%));
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 0 80% 55%;
+    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 1px 0 hsl(0 0% 0% / 0.4), 4px 4px 0 hsl(350 70% 50% / 0.18);
+
+    --sidebar-background: 350 20% 8%;
+    --sidebar-foreground: 350 10% 90%;
+    --sidebar-primary: 350 70% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 0 80% 55%;
+    --sidebar-accent: 350 15% 14%;
+    --sidebar-accent-foreground: 350 10% 90%;
+    --sidebar-border: 350 15% 20%;
+    --sidebar-ring: 350 70% 50%;
   }
 }
 
@@ -103,7 +116,7 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: 0.05em;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -134,27 +147,38 @@
     box-shadow: var(--shadow-card);
   }
 
+  /* Page background: layered crimson/rose color washes plus a large, faint
+     geometry drawing in two corners (class name kept for existing usages) */
   .geometric-bg {
-    background: linear-gradient(
-      -45deg,
-      hsl(0 85% 50% / 0.1),
-      hsl(0 70% 60% / 0.15),
-      hsl(0 60% 70% / 0.1),
-      hsl(0 85% 50% / 0.1)
-    );
-    background-size: 200% 200%;
-    animation: gradientMove 8s ease-in-out infinite;
+    position: relative;
+    isolation: isolate;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(circle at 0% 0%, hsl(var(--primary) / var(--bg-wash-strong)), transparent 45%),
+      radial-gradient(circle at 100% 15%, hsl(5 75% 60% / var(--bg-wash-soft)), transparent 40%),
+      radial-gradient(circle at 85% 100%, hsl(var(--primary) / var(--bg-wash-soft)), transparent 45%),
+      radial-gradient(circle at 5% 85%, hsl(335 65% 65% / var(--bg-wash-soft)), transparent 40%),
+      linear-gradient(180deg, hsl(var(--background-top)), hsl(var(--background)));
+    background-attachment: fixed;
   }
 
-  @keyframes gradientMove {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    100% {
-      background-position: 0% 0%;
+  .geometric-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/bg-geometry.svg"), url("/bg-geometry.svg");
+    background-repeat: no-repeat;
+    background-size: 560px 560px, 720px 720px;
+    background-position: -200px -160px, calc(100% + 260px) calc(100% + 240px);
+    opacity: var(--bg-art-opacity);
+  }
+
+  @media (max-width: 640px) {
+    .geometric-bg::before {
+      background-size: 360px 360px, 440px 440px;
+      background-position: -160px -120px, calc(100% + 180px) calc(100% + 160px);
     }
   }
 }

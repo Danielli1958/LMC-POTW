@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" fill="none" stroke="#b3203f" stroke-width="1.5">
+  <!-- concentric circles -->
+  <circle cx="300" cy="300" r="260"/>
+  <circle cx="300" cy="300" r="200"/>
+  <circle cx="300" cy="300" r="130" stroke-dasharray="6 8"/>
+  <!-- inscribed equilateral triangle -->
+  <polygon points="300,40 525.2,430 74.8,430"/>
+  <!-- triangle's incircle -->
+  <circle cx="300" cy="300" r="130"/>
+  <!-- axes -->
+  <line x1="20" y1="300" x2="580" y2="300" stroke-opacity="0.6"/>
+  <line x1="300" y1="20" x2="300" y2="580" stroke-opacity="0.6"/>
+  <!-- sine curve -->
+  <path d="M20 300 C 75 160, 130 160, 160 300 S 245 440, 300 300 S 385 160, 440 300 S 525 440, 580 300" stroke-width="2"/>
+  <!-- construction points -->
+  <g fill="#b3203f" stroke="none">
+    <circle cx="300" cy="40" r="5"/>
+    <circle cx="525.2" cy="430" r="5"/>
+    <circle cx="74.8" cy="430" r="5"/>
+    <circle cx="300" cy="300" r="5"/>
+  </g>
+</svg>
