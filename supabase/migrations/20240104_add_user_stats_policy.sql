@@ -1,0 +1,45 @@
+-- -- Drop existing policy if it exists
+-- DROP POLICY IF EXISTS "Users can update their own profile stats" ON public.profiles;
+
+-- -- Create the policy
+-- CREATE POLICY "Users can update their own profile stats"
+-- ON public.profiles
+-- FOR UPDATE
+-- TO authenticated
+-- USING (auth.uid() = user_id)
+-- WITH CHECK (auth.uid() = user_id);
+
+-- -- Drop the function if it exists
+-- DROP FUNCTION IF EXISTS public.update_user_stats(uuid, boolean, integer);
+
+-- -- Create the function
+-- CREATE OR REPLACE FUNCTION public.update_user_stats(
+--   p_user_id uuid,
+--   p_is_correct boolean,
+--   p_points integer
+-- ) 
+-- RETURNS void
+-- LANGUAGE plpgsql
+-- SECURITY DEFINER
+-- AS $$
+-- BEGIN
+--   -- Update total points and problems solved
+--   IF p_is_correct THEN
+--     UPDATE profiles
+--     SET 
+--       total_points = total_points + p_points,
+--       problems_solved = problems_solved + 1,
+--       current_streak = current_streak + 1,
+--       updated_at = NOW()
+--     WHERE user_id = p_user_id;
+--   ELSE
+--     -- For incorrect answers, just update the points and reset streak
+--     UPDATE profiles
+--     SET 
+--       total_points = total_points + p_points,
+--       current_streak = 0,
+--       updated_at = NOW()
+--     WHERE user_id = p_user_id;
+--   END IF;
+-- END;
+-- $$;
