@@ -1,37 +1,86 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const WORK_PHOTO_BUCKET = "lmc-work-photos";
-export const MAX_WORK_PHOTO_BYTES = 10 * 1024 * 1024;
-const MAX_DIMENSION = 1600;
+
+/** Every photo is compressed to this size or smaller before upload. */
+export const TARGET_WORK_PHOTO_BYTES = 300 * 1024;
 
 /**
- * Phone photos are often 3-10 MB. Shrink to at most 1600px on the long edge as a
- * JPEG, which keeps handwriting readable. If the browser can't decode the image
- * (e.g. HEIC in Chrome), the original file is uploaded instead.
+ * Hard cap, also enforced by the bucket's file_size_limit. Only matters for
+ * images the browser can't re-encode (e.g. HEIC in desktop Chrome).
  */
-async function shrinkImage(file: File): Promise<Blob> {
+export const MAX_WORK_PHOTO_BYTES = 1024 * 1024;
+
+/**
+ * Compression steps, tried in order until the photo fits the target.
+ * Quality drops first (cheap on legibility), then resolution.
+ */
+const MAX_DIMENSIONS = [1600, 1400, 1200, 1000, 800];
+const QUALITIES = [0.85, 0.75, 0.65, 0.55];
+const LAST_RESORT_QUALITY = 0.4;
+
+const encodeJpeg = (canvas: HTMLCanvasElement, quality: number) =>
+  new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+
+const drawScaled = (bitmap: ImageBitmap, maxDimension: number) => {
+  const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  // White background so transparent PNGs don't turn black as JPEGs.
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  return canvas;
+};
+
+/**
+ * Compresses a photo to a JPEG of at most TARGET_WORK_PHOTO_BYTES.
+ * Returns null if the browser can't decode the image.
+ */
+async function compressToTarget(file: File): Promise<Blob | null> {
+  let bitmap: ImageBitmap;
   try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return file;
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
-    return blob && blob.size < file.size ? blob : file;
+    bitmap = await createImageBitmap(file);
   } catch {
-    return file;
+    return null;
+  }
+
+  try {
+    let smallest: Blob | null = null;
+    for (const maxDimension of MAX_DIMENSIONS) {
+      const canvas = drawScaled(bitmap, maxDimension);
+      if (!canvas) return null;
+      const isLastStep = maxDimension === MAX_DIMENSIONS[MAX_DIMENSIONS.length - 1];
+      const qualities = isLastStep ? [...QUALITIES, LAST_RESORT_QUALITY] : QUALITIES;
+      for (const quality of qualities) {
+        const blob = await encodeJpeg(canvas, quality);
+        if (!blob) continue;
+        if (blob.size <= TARGET_WORK_PHOTO_BYTES) return blob;
+        if (!smallest || blob.size < smallest.size) smallest = blob;
+      }
+    }
+    // Extremely detailed images may still be slightly over; use the smallest attempt.
+    return smallest;
+  } finally {
+    bitmap.close();
   }
 }
 
 /** Uploads a work photo and returns its storage path (<user id>/<problem id>/<file>). */
 export async function uploadWorkPhoto(userId: string, problemId: string, file: File): Promise<string> {
-  const image = await shrinkImage(file);
+  const compressed = await compressToTarget(file);
+  // If the browser couldn't re-encode it, the original is used only if it's already small.
+  const image: Blob = compressed ?? file;
+
   if (image.size > MAX_WORK_PHOTO_BYTES) {
-    throw new Error("That photo is too large. Please use a photo under 10 MB.");
+    throw new Error(
+      compressed
+        ? "That photo couldn't be made small enough. Please try a different photo."
+        : "This photo format isn't supported. Please upload a JPG or PNG photo."
+    );
   }
 
   const ext = image.type === "image/jpeg" ? "jpg" : (file.name.split(".").pop() || "img").toLowerCase();

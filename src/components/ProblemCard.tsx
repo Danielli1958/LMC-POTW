@@ -289,7 +289,7 @@ export function ProblemCard({
                 Photo of your work <span className="text-destructive">*</span>
               </Label>
               <p className="text-sm text-muted-foreground">
-                Take or upload a picture showing how you solved the problem.
+                Take or upload a picture of your work showing how you solved the problem.
               </p>
               <input
                 ref={photoInputRef}
